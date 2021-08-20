@@ -20,7 +20,15 @@ function buildToken(user) {
 }
 
 router.post("/register", validateRoleName, (req, res, next) => {
- 
+ const { username, password } = req.body
+ const { role_name } = req
+ const hash = bcrypt.hashSync(password, 8)
+
+ Users.add({ username, password: hash, role_name })
+  .then(newUser => {
+    res.status(201).json(newUser)
+  })
+  .catch(next())
   /**
     [POST] /api/auth/register { "username": "anna", "password": "1234", "role_name": "angel" }
 
@@ -36,14 +44,10 @@ router.post("/register", validateRoleName, (req, res, next) => {
 
 
 router.post("/login", checkUsernameExists, (req, res, next) => {
-  let { username, password } = req.body;
-
-  Users.findBy({ username })
-    .then(([user]) => {
-      if(user && bcrypt.compareSync(password, user.password)) {
-        const token = buildToken(user)
+      if(bcrypt.compareSync(req.body.password, req.user.password)) {
+        const token = buildToken(req.user)
         res.status(200).json({
-          message: `${user.username} is back!`,
+          message: `${req.user.username} is back!`,
           token : token,
         });
       } else {

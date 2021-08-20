@@ -2,32 +2,14 @@ const db = require('../../data/db-config.js');
 
 function find() {
   return db("users as u")
-  .join("roles as r", "u.role_id", "=", "r.role_id")
-  .select("u.user_id", "u.username", "r.role_name");
-  
-  /**
-    You will need to join two tables.
-    Resolves to an ARRAY with all users.
-
-    [
-      {
-        "user_id": 1,
-        "username": "bob",
-        "role_name": "admin"
-      },
-      {
-        "user_id": 2,
-        "username": "sue",
-        "role_name": "instructor"
-      }
-    ]
-   */
+  .join("roles", "u.role_id", "=", "roles.role_id")
+  .select("u.user_id", "u.username", "roles.role_name");
 }
 
 function findBy(filter) {
   return db("users as u")
-  .join("roles as r", "u.role_id", "=", "r.role_id")
-  .select("u.user_id","u.username","u.password","r.role_name")
+  .join("roles", "u.role_id", "roles.role_id")
+  .select("u.user_id","u.username","u.password","role_name")
   .where(filter);
   
   /**
@@ -47,8 +29,8 @@ function findBy(filter) {
 
 function findById(user_id) {
   return db("users as u")
-  .join("roles as r", "u.role_id","=","r.role_id")
-  .select("u.user_id","u.username","r.role_name")
+  .join("roles", "u.role_id","roles.role_id")
+  .select("u.user_id","u.username","role_name")
   .where("u.user_id", user_id)
   .first()
 
